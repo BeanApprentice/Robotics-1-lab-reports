@@ -1,0 +1,31 @@
+/* 
+  This program allows the arduino to measure the resistance of a resistor by placing it in series 
+  with a reference resistor with a known, fixed value. The unknown resistance goes from 5V to an 
+  analog input pin, and the reference resistor, with a resistance of 1000 ohms, goes from the 
+  analog input pin to ground. This creates a voltage divider, and the output of this divider 
+  is read by the analog pin and used to calculate the unknown resistance by using the properties 
+  of series circuits and ohm's law. 
+*/ 
+ 
+ 
+void setup(){  
+  pinMode(A0, INPUT); // show that A0 is being used as an input, though it is already set as such by default 
+  Serial.begin(9600); 
+}  
+void loop(){  
+  // obtain the voltage from pin A0 to GND. This is also the voltage across our known reference resistor due to the layout of the circuit. 
+  float VA0 = analogRead(A0)/204.6; // since we don't need to remember the bit value of the pin for later use, directly convert this bit value into a decimal voltage. 
+  // because the known resistor and the unknown resistors are in series, the supply voltage of 5V is split across them. 
+  // Therefore, the voltage across the unknown resistor only is equal to the difference between the 5V supply and the voltage across the known resistor. 
+  float Vresistor = 5.0 - VA0; 
+  // Since the circuit uses a 1kOhm resistor as the fixed reference resistance value, we simply divide the voltage across this known resistor by 1000 to obtain the current through BOTH resistors.  
+  float Iresistor = VA0 / 1000; 
+  // finally, using ohm's law with the determined voltage and current of the unknown resistor, we calculate the resistance of the unknown resistor. 
+  float resistance = Vresistor / Iresistor;  
+  Serial.print("Resistance: ");  
+  Serial.print(resistance); // print the calculated resistance value of the unknown resistor, along with some text for context. 
+  Serial.println(" ohms.");  
+ 
+ 
+  delay(50);  
+}  
