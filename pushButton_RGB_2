@@ -1,0 +1,32 @@
+/* 
+  Use the input from a pushbutton to control a common-anode RGB LED.  
+  In this case, we want the RGB light to produce yellow when the button 
+  is not pressed, and purple when it is pressed. 
+*/ 
+ 
+ 
+// use constant variables with appropriate names to refer to the LED and button pins. 
+const int red = 2; 
+const int green = 3; 
+const int blue = 4; 
+const int buttonPin = 5; 
+ 
+ 
+void setup() { 
+  pinMode(red, OUTPUT); // set out LED pins as outputs to remove the large internal series resistance of the pin. 
+  pinMode(green, OUTPUT); 
+  pinMode(blue, OUTPUT); 
+ 
+ 
+  pinMode(buttonPin, INPUT_PULLUP); // use the internal pullup resistor to simplify the breadboard circuit. 
+} 
+ 
+ 
+void loop() { 
+  // because the RGB LED is common-anode, all the individual LEDs have their positive ends tied. So to turn one or more LEDs on, their negative ends must be pulled low. 
+  digitalWrite(red, LOW); // the red LED is always on, because both the colors yellow and purple require red.  
+  int buttonState = digitalRead(buttonPin); // store the reading of the button pin in a variable for later use 
+  // use the same trick from the previous sketch to remove the need for an if statement 
+  digitalWrite(green, !buttonState); // use a ! symbol to invert the value given by the variable.  
+  digitalWrite(blue, buttonState); 
+} 
