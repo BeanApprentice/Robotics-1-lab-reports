@@ -1,0 +1,14 @@
+/* 
+  This program periodically blinks an LED on and using the digitalWrite() function and delays. 
+*/ 
+void setup() { 
+  pinMode(2, OUTPUT); // tells the arduino to configure the desired pin as an output. This removes the high-value series resistance that is normally present in the pin. 
+} 
+  
+void loop() { 
+  digitalWrite(2, HIGH); // sets the signal state of the digital pin to HIGH, which corresponds to the supply voltage of the arduino, which is 5V. 
+  delay(500); // stop the program in its tracks, and wait for the specified amount of milliseconds before moving to the next line. 
+   
+  digitalWrite(2, LOW); // sets the signal state of the digital pin to LOW, which corresponds to 0V. 
+  delay(500); 
+} 
