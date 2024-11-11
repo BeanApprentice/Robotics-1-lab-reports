@@ -1,0 +1,39 @@
+/* 
+  This program demonstrates the usefuless of the millis() function by 
+  simultaneously having an LED blink and detect a button being pressed, without 
+  either process affecting the other. The millis() function acts like a stopwatch, 
+  allowing for delays to be created for a process without blocking the execution of the 
+  entire program. 
+*/ 
+ 
+ 
+  const int blinkLED = 2; // control two LEDs, one blinking at a constant frequency and the other blinking with a button press 
+  const int buttonLED = 3; 
+ 
+ 
+  const int buttonPin = 4; 
+ 
+ 
+  bool LEDstate = false; // invert this value to blink the LED on and off 
+  long oldMillis = 0; // use a variable to keep reference of the start time of each LED blink cycle. The 'long' datatype allows for the variable to keep counting up to 25 days worth of milliseconds. 
+  // When the difference between the current time and the old time exceeds some amount, reset the old time and perform the blinking action. 
+ 
+ 
+void setup() { 
+  pinMode(blinkLED, OUTPUT); 
+  pinMode(buttonLED, OUTPUT); 
+  pinMode(buttonPin, INPUT_PULLUP); 
+} 
+ 
+ 
+void loop() { 
+  digitalWrite(buttonLED, !digitalRead(buttonPin)); // control one of the LEDs directly from the reading of the pushbutton. 
+ 
+ 
+  if (millis() - oldMillis >= 500) {  
+    // once the millis stopwatch has gone 500 ms past the reference time, bring forward the reference time to the new stopwatch time and blink the LED 
+    oldMillis = millis(); 
+    LEDstate = !LEDstate; 
+    digitalWrite(blinkLED, LEDstate); 
+  } 
+} 
