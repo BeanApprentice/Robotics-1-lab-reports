@@ -1,0 +1,35 @@
+/* 
+  This program periodically flashes a row of 3 LEDs 1 after the other, in a "chaser" effect. However, instead of returning to the first LED directly, the program goes back in forth between the LEDs in each direction 
+*/ 
+void setup() { 
+  pinMode(2, OUTPUT); // tells the arduino to configure the desired pin as an output. This removes the high-value series resistance that is normally present in the pin. 
+  pinMode(3, OUTPUT); 
+  pinMode(4, OUTPUT); 
+  pinMode(5, OUTPUT); 
+} 
+  
+void loop() { 
+  digitalWrite(3, LOW); // sets the signal state of the digital pin to LOW, which corresponds to 0V. 
+  digitalWrite(2, HIGH); // sets the signal state of the digital pin to HIGH, which corresponds to the supply voltage of the arduino, which is 5V. 
+  delay(333); // stop the program in its tracks, and wait for the specified amount of milliseconds before moving to the next line. 
+  
+  digitalWrite(2, LOW); // although there are 4 LEDs, only 2 need to be controlled at a time, because for every step in the chaser one light turns off and one light turns on, while the third and fourth light remains off. 
+  digitalWrite(3, HIGH); 
+  delay(333);  
+  
+  digitalWrite(3, LOW); 
+  digitalWrite(4, HIGH); 
+  delay(333);  
+  
+  digitalWrite(4, LOW); 
+  digitalWrite(5, HIGH); 
+  delay(333); 
+  
+  digitalWrite(5, LOW); // return the blinking pattern backwards 
+  digitalWrite(4, HIGH); 
+  delay(333); 
+  
+  digitalWrite(4, LOW); 
+  digitalWrite(3, HIGH); 
+  delay(333); 
+} 
