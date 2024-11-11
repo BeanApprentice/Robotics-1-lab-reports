@@ -1,0 +1,42 @@
+/* 
+  Use the input from a pushbutton to control a common-anode RGB LED.  
+  In this case, just turn all the individual LEDs on when the button is pressed, 
+  making the LED in theory shine white. The color in reality will be slight off, 
+  because the individual LEDs do not have the same brightness.  
+*/ 
+ 
+ 
+// use constant variables with appropriate names to refer to the LED and button pins. 
+const int red = 2; 
+const int green = 3; 
+const int blue = 4; 
+const int buttonPin = 5; 
+ 
+ 
+void setup() { 
+  pinMode(red, OUTPUT); // set out LED pins as outputs to remove the large internal series   resistance of the pin. 
+  pinMode(green, OUTPUT); 
+  pinMode(blue, OUTPUT); 
+ 
+ 
+  pinMode(buttonPin, INPUT_PULLUP); // use the internal pullup resistor to simplify the breadboard circuit. 
+} 
+ 
+ 
+void loop() { 
+  // because the RGB LED is common-anode, all the individual LEDs have their positive ends tied. So to turn one or more LEDs on, their negative ends must be pulled low. 
+  int buttonState = digitalRead(buttonPin); // store the reading of the button pin in a variable for later use 
+ 
+ 
+/* 
+  We want the LED to glow when the button is pressed. Because the button is set up across the input pin and ground, 
+  the arduino will read Low when it is pressed. And because the LED is common-anode, the 3 led pins connect to the 
+  negative side of each individual LED, so the LEDs turn on when this pin is connected to GND. 
+  So we can directly use the value of the button state to turn on the LEDs, removing the need for an if statement. 
+  When the button is pressed, the button state is low, which feeds into the digital write functions, bringing all 
+  the negative sides of the 3 LEDs to the ground, which turns them on. 
+*/ 
+  digitalWrite(red, buttonState); 
+  digitalWrite(green, buttonState); 
+  digitalWrite(blue, buttonState); 
+} 
