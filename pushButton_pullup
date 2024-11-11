@@ -1,0 +1,43 @@
+/* 
+  Use a pushbutton to turn on and off an LED and print the state of the button to the serial monitor. 
+  The pushbutton will, when pressed, connect an input pin to ground, and when not pressed, 
+  a pull-up resistor will pull the input pin to VCC. 
+*/ 
+ 
+ 
+const int buttonPin = 2; // the number of the pushbutton pin 
+const int ledPin = 13; // the number of the LED pin 
+ 
+ 
+int buttonState = 0; // variable to store the digital reading of the pushbutton pin. This will be HIGH (1) if the pin gets 5V, or LOW (0) if it gets 0V. 
+ 
+ 
+void setup() { 
+  pinMode(ledPin, OUTPUT); 
+  pinMode(buttonPin, INPUT); // since we are reading from the button pin rather that writing, we set it as an input 
+ 
+  // establish a communication between the arduino and the computer. 
+  Serial.begin(9600); // The 9600 represents a data rate, which needs to be the same on both the arduino and the PC, otherwise the two devices will not understand eachother.  
+} 
+ 
+ 
+void loop() { 
+  buttonState = digitalRead(buttonPin); // set the state variable to equal the reading of the   buttonPin. 
+  // Pin readings are never automatically stored, so we the programmer must manually store them in some variable if we want to use them later in the code. 
+ 
+ 
+  Serial.print("Button pin value: "); // print a string of text using quotes into the serial monitor. This is to contextualize the printed data for the human reader. 
+  Serial.println(buttonState); // print the actual value of the buttonState variable, then make a new line in the monitor. 
+ 
+ 
+  // use an if statement to check whether or not the button is pressed 
+  if (buttonState == HIGH) { // if the button state is HIGH, then the LED pin will be set to HIGH (5V).  
+    digitalWrite(ledPin, HIGH); // Because we are using a pull-up resistor on the button, when the button pin reads high, it means that the button is not being pressed. 
+    // And so, the LED will be on while the button is unpressed. 
+    Serial.println("Button is not being pressed"); 
+  } 
+  else { // if the button state is not HIGH (if it is LOW), then the LED pin will be set to LOW (0V). 
+    digitalWrite(ledPin, LOW); // The LED will turn off while the button is being pressed. 
+    Serial.println("Button is being pressed"); 
+  } 
+} 
