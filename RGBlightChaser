@@ -1,0 +1,59 @@
+/* 
+  Using a common-anode RGB LED, the arduino periodically blinks one or two of the individual LEDs 
+  in order to produce an infinitely looping sequence of the colors red, yellow, green, cyan, blue, and purple/magenta. 
+*/ 
+ 
+ 
+int waitTime = 750; // adjust all the delay times using this integer variable 
+ 
+ 
+// a lot of digital writes will be made, so it is best for human understanding to reference the output pins with variables named after the color which the pin controls. 
+const int red = 2; 
+const int green = 3; 
+const int blue = 4; 
+ 
+ 
+void setup() { 
+  pinMode(red, OUTPUT); // set out LED pins as outputs to remove the large internal series resistance of the pin. 
+  pinMode(green, OUTPUT); 
+  pinMode(blue, OUTPUT); 
+} 
+ 
+ 
+void loop() { 
+  // because the RGB LED is common-anode, all the individual LEDs have their positive ends tied. So to turn one LED on, its negative end must be pulled low. 
+  digitalWrite(red, LOW); // red LED is on, other two are off 
+  digitalWrite(green, HIGH); 
+  digitalWrite(blue, HIGH); 
+  delay(waitTime); 
+ 
+ 
+  digitalWrite(red, LOW); 
+  digitalWrite(green, LOW); 
+  digitalWrite(blue, HIGH); 
+  delay(waitTime); 
+ 
+ 
+  digitalWrite(red, HIGH); 
+  digitalWrite(green, LOW); 
+  digitalWrite(blue, HIGH); 
+  delay(waitTime); 
+ 
+ 
+  digitalWrite(red, HIGH); 
+  digitalWrite(green, LOW); 
+  digitalWrite(blue, LOW); 
+  delay(waitTime); 
+ 
+ 
+  digitalWrite(red, HIGH); 
+  digitalWrite(green, HIGH); 
+  digitalWrite(blue, LOW); 
+  delay(waitTime); 
+ 
+ 
+  digitalWrite(red, LOW); 
+  digitalWrite(green, HIGH); 
+  digitalWrite(blue, LOW); 
+  delay(waitTime); 
+} 
