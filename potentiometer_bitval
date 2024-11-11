@@ -1,0 +1,19 @@
+/* 
+  Uses the analogRead function to obtain a bit value from an analog input pin,  
+  which represents the voltage on that pin relative to ground. This input pin 
+  is connected the center pin of a potentiometer, which allows the arduino 
+  to read an analog signal created by the variable voltage divider. 
+*/ 
+ 
+ 
+void setup() { 
+  pinMode(A0, INPUT); // it is not necessary to set a pin as an input, as they are already inputs by default, but it helps for human readability. 
+  Serial.begin(9600); // establish the communication between the arduino and the computer at the common speed of 9600 bits/s. 
+} 
+ 
+ 
+void loop() { 
+  int sensorValue = analogRead(A0); // stores the analog input from the pin into a variable for later use. 
+  Serial.println(sensorValue); // The value can range from 0 o 1023, where 1023 corresponds to VCC, 512 is approximately VCC/2 and 0 is 0V. 
+  delay(10); // delay in between reads for stability 
+} 
