@@ -1,0 +1,28 @@
+/* 
+  Uses the analogRead function to obtain a bit value from an analog input pin,  
+  which is then converted into a voltage value to be printed to the serial monitor. 
+  This conversion from bit value to voltage is based on a proportional relationship, where 
+  each volt is equal to 204.6 bits. This essentially makes the arduino into a volt meter. 
+*/ 
+ 
+ 
+void setup() { 
+  pinMode(A0, INPUT); // it is not necessary to set a pin as an input, as they are already inputs by default, but it helps for human readability. 
+  Serial.begin(9600); // establish the communication between the arduino and the computer at the common speed of 9600 bits/s. 
+} 
+ 
+ 
+void loop() { 
+  int sensorValue = analogRead(A0); // stores the analog input from the pin into a variable for later use. 
+  float voltage = sensorValue / 204.6; // this variable must be a float, so that it can store the voltage value as a decimal number. 
+  Serial.print("Bit value: "); 
+  Serial.println(sensorValue); // The value can range from 0 o 1023, where 1023 corresponds to VCC, 512 is approximately VCC/2 and 0 is 0V. 
+ 
+ 
+  Serial.print("Voltage: "); 
+  Serial.print(voltage); // the value will range from 5.00V to 0.00V. Negative voltages cannot be read. 
+  Serial.println("V"); 
+ 
+ 
+  delay(10); // delay in between reads for stability 
+} 
