@@ -1,0 +1,41 @@
+/*
+  Use the arduino to control an ultrasonic sensor, a device which detects the distance to the nearest
+  obstacle in front of it. This is a digital sensor which makes use of the speed of sound to provide a
+  timed digital signal, which the arduino needs to decode in order to calculate distance. 
+*/
+
+const int echo = 12; // pins to control the trigger and echo functions on the sensor.
+const int trig = 13;
+
+int see() { // store the code for the operation of the sensor inside a function, so that's it is clearer to understand
+  long duration; // set up the duration value as a long, because the pulseIn function, which measures the duration of a pulse in microseconds, returns a long datatype value.
+  int dist;
+  
+  digitalWrite(trig, LOW); // clears the trigPin before the next sound pulse.
+  delayMicroseconds(2);
+  // set the trigPin on HIGH state for 10 micro seconds. This will cause the ultrasonic sensor to emit a forward-facing burst of high-frequency sound, called ultrasound.
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  // this burst of ultrasound will take a certain amount of time to be reflected back to the sensor, the duration of which is returned by the pulseIn function.
+  duration = pulseIn(echo, HIGH);
+  // knowing that the speed of sound is 343m/s, or 0.034 cm/microsecond, the distance of the sound's trajectory can be calculated given the duration.
+  dist = duration * 0.034 / 2; // we divide by 2, so that we only use the amount of time taken for the sound to trave one way, rather than the time of a round-trip.
+  return dist; // return the calculated integer value (the distance in cm) to whichever part of the program has called the see function.
+}
+
+void setup() {
+  pinMode(trig, OUTPUT); // the trig pin is used to trigger the ultrasound emission, so it must be an output.
+  pinMode(echo, INPUT); // the echo pin is used to detect the reflection of the sound off of an obstacle, so it must be an input.
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  int distance = see(); // store the detected distance value in a variable so we can use it later.
+  Serial.print("Distance to the obstacle: ");
+  Serial.print(distance);
+  Serial.println("cm");
+
+  delay(50); // a short delay so that the Serial terminal isn't completely flooded with messages
+}
