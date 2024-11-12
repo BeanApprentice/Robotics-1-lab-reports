@@ -1,0 +1,92 @@
+/*
+  This code combines the functionalities of the DHT11 sketch with the ultrasonic sensor sketch.
+  It uses two millis()-based timers so that each sensor can work at its own rate.
+*/
+
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+
+#define DHTPIN 4     // Digital pin connected to the DHT sensor 
+#define DHTTYPE    DHT11     // DHT 11
+
+DHT_Unified dht(DHTPIN, DHTTYPE); // create the sensor object
+uint32_t delayMS;
+
+long lastUltra = 0; // to keep track of the last time the ultrasonic sensor was used. This will be refreshed every 250ms.
+long lastDHT = 0; // to keep track of the last time the ultrasonic sensor was used. This should be refreshed every 1000ms by default.
+
+const int echo = 12; // pins to control the trigger and echo functions on the sensor.
+const int trig = 13;
+
+int see() { // store the code for the operation of the sensor inside a function, so that's it is clearer to understand
+  long duration; // set up the duration value as a long, because the pulseIn function, which measures the duration of a pulse in microseconds, returns a long datatype value.
+  int dist;
+  
+  digitalWrite(trig, LOW); // clears the trigPin before the next sound pulse.
+  delayMicroseconds(2);
+  // set the trigPin on HIGH state for 10 micro seconds. This will cause the ultrasonic sensor to emit a forward-facing burst of high-frequency sound, called ultrasound.
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  // this burst of ultrasound will take a certain amount of time to be reflected back to the sensor, the duration of which is returned by the pulseIn function.
+  duration = pulseIn(echo, HIGH);
+  // knowing that the speed of sound is 343m/s, or 0.034 cm/microsecond, the distance of the sound's trajectory can be calculated given the duration.
+  dist = duration * 0.034 / 2; // we divide by 2, so that we only use the amount of time taken for the sound to trave one way, rather than the time of a round-trip.
+  return dist; // return the calculated integer value (the distance in cm) to whichever part of the program has called the see function.
+}
+
+void setup() {
+  pinMode(trig, OUTPUT); // the trig pin is used to trigger the ultrasound emission, so it must be an output.
+  pinMode(echo, INPUT); // the echo pin is used to detect the reflection of the sound off of an obstacle, so it must be an input.
+
+  Serial.begin(9600);
+  // Initialize device.
+  dht.begin();
+  Serial.println(F("DHTxx Unified Sensor Example"));
+  
+  sensor_t sensor;
+  dht.temperature().getSensor(&sensor);
+  dht.humidity().getSensor(&sensor);
+  // Set delay between sensor readings based on sensor details.
+  delayMS = sensor.min_delay / 1000;
+}
+
+void loop() {
+  // when the program is long and millis is needed in many places to get the current time, it's better practice to put the value in a variable in case the program takes long to loop
+  long currentTime = millis();
+
+  if (currentTime - lastUltra >= 250) {
+    lastUltra = currentTime; // make the previous ultrasonic sensor time catch up with the current time, so that it takes another 250ms for this if statement to trigger once again
+    int distance = see();
+    Serial.print("Distance to the obstacle: ");
+    Serial.print(distance);
+    Serial.println("cm");
+  }
+
+  if (currentTime - lastDHT >= delayMS) {
+    lastDHT = currentTime; // make the previous DHT sensor time catch up with the current time, so that it takes another 1000ms for this if statement to trigger once again
+    // Get temperature event and print its value.
+    sensors_event_t event;
+    dht.temperature().getEvent(&event);
+    if (isnan(event.temperature)) {
+      Serial.println(F("Error reading temperature!"));
+    }
+    else {
+      Serial.print(F("Temperature: "));
+      Serial.print(event.temperature);
+      Serial.println(F("°C"));
+    }
+    // Get humidity event and print its value.
+    dht.humidity().getEvent(&event);
+    if (isnan(event.relative_humidity)) {
+      Serial.println(F("Error reading humidity!"));
+    }
+    else {
+      Serial.print(F("Humidity: "));
+      Serial.print(event.relative_humidity);
+      Serial.println(F("%"));
+    }
+  }
+
+}
