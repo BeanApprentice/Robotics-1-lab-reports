@@ -1,0 +1,53 @@
+/*
+  Use a servo along with a photoresistor to make a light intensity gauge. The servo will swing along the gauge
+  from its minimum angle, when the light intensity is dark, to its maximum angle, when the light intensity is
+  bright (ambient room brightness). The user can raise or lower their hand above the photoresistor
+  to cause the servo to swing along its arc to precise angles. This sketch uses the same library and
+  motion dampening system from the voltage gauge sketch.
+*/
+
+#include <Servo.h>
+
+Servo myservo; // create servo object using the keyword "Servo" which comes from the library. The name of this object is myservo, and functions can be performed on this object to control a servo.
+
+int potpin = A0; // analog pin used to connect the potentiometer (pot for short)
+int val; // variable to read the bit value from the analog pin connected to the pot
+int oldVal; // used to detect a change in the bit value read from the pot, or in other words, if it does not match with the current val. This is just used for the serial printing, to avoid unnecessary spam.
+int angle = 90; // store the target angle that the servo should go to. This will be set by mapping the value of the potentiometer bit value.
+// dampened angle is used to smooth the rotational motion of the servo, in case there is any ripple in the analog voltage reading. This value is what will actually be sent to the servo.
+int dampenedAngle = 90; // Whenever there is a difference between the target angle and the dampened angle, the dampened angle will rise or fall in increments of 1 until it reaches the target angle.
+
+void setup() {
+  myservo.attach(9); // tells the library to use pin 9 to operate the myservo Servo object. No need to set this pin as an output, the library takes care of it.
+  pinMode(A0, INPUT);
+  pinMode(A5, OUTPUT); // for an additional LED component to light when the voltage reading is below a certain amount.
+  Serial.begin(9600);
+}
+
+void loop() {
+  val = analogRead(potpin); // reads the bit value of the potentiometer pin, which can range form 0 to 1023.
+  // use the map function to convert the expected range of bit values, 330 to 530, into a valid range of angles for the servo to turn, from 180 to 0.
+  angle = map(val, 330, 530, 180, 0); // this bit value range must be calibrated experimentally.
+  // alternatively, the bit values 140 to 860 can be used so that the light gauge can show a wider range of brightness values, from near pitch-black to super bright.
+
+  if (val != oldVal) {
+    oldVal = val;
+    //Serial.print("Voltage: ");
+    //Serial.print(val/204.6); Serial.println("V");
+  }
+
+  if (angle - dampenedAngle > 0) { // if the target angle is greater than the dampened angle, increase the dampened angle by 1. It will keep increasing by 1 until it meets the target angle again.
+    dampenedAngle++;
+  } // change the number 0 in the conditions to some positive number if a deadzone is desired to further reduce servo jittering.
+  // For example, if the number is 3, then the dampened angle will not start increasing until the target angle is more than 3 above the dampened angle.
+  if (dampenedAngle - angle > 0) { // if the target angle is less than the dampened angle, decrease the dampened angle by 1. It will keep decreasing by 1 until it meets the target angle again.
+    dampenedAngle--;
+  }
+  myservo.write(dampenedAngle); // Finally, set the servo position according to the dampened and correctly scaled value.
+
+  if (val > 512) { // if the brightness goes below a certain amount, turn on an LED like a night light. This light will interfere with the photoresistor if pointed towards it.
+    digitalWrite(A5, LOW);
+  } else {
+    digitalWrite(A5, HIGH);
+  }
+}
