@@ -1,67 +1,51 @@
 /*
-  Stepper Motor Demonstration 1
-  Stepper-Demo1.ino
-  Demonstrates 28BYJ-48 Unipolar Stepper with ULN2003 Driver
-  Uses Arduino Stepper Library
-
-  DroneBot Workshop 2018
-  https://dronebotworkshop.com
+  This sketch uses a joystick to control the speed and direction of a stepper motor. A joystick is just a two-axis potentiometer,
+  and by tapping into just one axis we get the same analog behaviour as a regular pot. A stepper motor, as the name suggests,
+  is a kind of motor that moves in steps, and by controlling the duration in betweeen steps we can control the speed of the
+  motor. By using the built-in stepper motor library, we can easily output signals to a stepper motor driver to control
+  the speed and direction of the motor based on the analog reading of the joystick.
 */
 
-//Include the Arduino Stepper Library
 #include <Stepper.h>
-
-// Define Constants
 
 // Number of steps per internal motor revolution 
 const float STEPS_PER_REV = 32; 
 
-//  Amount of Gear Reduction
+//  Amount of Gear Reduction. The stepper motor model we are using has an internal gearbox.
 const float GEAR_RED = 64;
 
 // Number of steps per geared output rotation
 const float STEPS_PER_OUT_REV = STEPS_PER_REV * GEAR_RED;
 
-// Define Variables
+// I have my wiring set up so that pins 8, 9, 10, 11 go to the motor driver pins in1, in2, in3, in4, but for some reason the motor was only turning one way.
+// I'm going to be honest, I have no idea why this works, but by changing the pins in the code to 8, 10, 9, 11, the motor now can turn both ways.
+Stepper steppermotor(STEPS_PER_REV, 8, 10, 9, 11); // create a stepper motor object using the library keyword "Stepper" with the appropriate parameters, including the 4 pins on the arduino to control the motor driver.
+// no need to set these pins as outputs, the library takes care of it.
 
-// Number of Steps Required
-int StepsRequired;
-
-// Create Instance of Stepper Class
-// Specify Pins used for motor coils
-// The pins used are 8,9,10,11 
-// Connected to ULN2003 Motor Driver In1, In2, In3, In4 
-// Pins entered in sequence 1-3-2-4 for proper step sequencing
-
-Stepper steppermotor(STEPS_PER_REV, 8, 9, 10, 11);
-
-void setup()
-{
-  // Nothing  (Stepper Library sets pins as outputs)
-  pinMode(A0, INPUT);
+void setup() {
   Serial.begin(9600);
 }
 
-void loop()
-{
-  // Slow - 4-step CW sequence to observe lights on driver board
-  
+void loop() {
+  int bitValue = analogRead(A0); // the axis of the joystick is connected to pin A0. In reality this is just the middle pin of a potentiometer.
 
-  // Rotate CW 1/2 turn slowly
-  int speed = (analogRead(A0) - 512);
-  Serial.println(speed);
+  int Speed = (bitValue - 512)/1.024; // convert the bit value, with a range of 0-1023, into a usable speed value with a range of -500 to 500. 
+  
+  if (abs(Speed) < 8) { // add a small deadzone for the joystick by deleting any value within -8 to +8.
+    Speed = 0;
+  }
+  Serial.println(Speed);
 
-  if (speed >= 0) {
-    steppermotor.setSpeed(speed);   
-    steppermotor.step(100);
+  if (Speed > 0) {
+    steppermotor.setSpeed(Speed); // use the library's function to set the desired speed of the stepper motor.
+    steppermotor.step(1); // Use the library's step function to make a single step in the desired direction (positive or negative). The speed of this step is determined by calling the .setSpeed(). 
   }
-  else {
-    steppermotor.setSpeed(0-speed);   
-    steppermotor.step(-100);
+  else if (Speed < 0){ // if the speed is exactly zero, then neither of these if statements will trigger and the loop will continue. This is important, because we do not want to initiate a step with 0 speed.
+    Speed = Speed*(-1); // make the speed positive to avoid breaking the set speed function
+    steppermotor.setSpeed(Speed);   
+    steppermotor.step(-1);
   }
   
-  delay(100);
-  
-  
+  //delay(10);
 
 }
